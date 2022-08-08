@@ -1,0 +1,44 @@
+@import url(https://fonts.googleapis.com/css?family=Nunito:800);
+@import url(https://fonts.googleapis.com/css?family=Inter:regular,500,600,800,900);
+@import url(https://fonts.googleapis.com/css?family=IBM+Plex+Sans:regular);
+
+body {
+  font-family: "Inter", sans-serif;
+  font-weight: normal;
+  font-style: normal;
+  font-size: 16px;
+  color: #000000;
+  background-color: #635d5d;
+}
+
+a {
+  color: white;
+  width: max-content;
+  height: max-content;
+}
+
+.root {
+  margin: 0 auto;
+  background-color: #ffffff;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+  height: 100vh;
+}
+
+.main {
+  min-height: 100vh;
+  display: grid;
+  padding-left: 30px;
+  grid-template-columns: 1fr 1fr 100px;
+  grid-template-rows: 1fr;
+  transition: 0.5s;
+}
+
+.main__move {
+  transform: translateX(-280px);
+  transition: 1s;
+}
+
+.footer {
+}

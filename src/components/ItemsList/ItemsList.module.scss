@@ -1,0 +1,17 @@
+.itemsList {
+  max-height: 790px;
+  overflow-y: auto;
+  padding: 20px;
+  &::-webkit-scrollbar {
+    width: 5px;
+  }
+  &::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background-color: #13315e;
+  }
+  &::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    background-color: #f9f9fd;
+  }
+}

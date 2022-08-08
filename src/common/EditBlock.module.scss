@@ -1,0 +1,25 @@
+.editBlock {
+  position: absolute;
+  top: 10px;
+  left: 150px;
+  width: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  column-gap: 20px;
+  opacity: 0;
+  visibility: hidden;
+  transition: 0.4s;
+}
+
+.show {
+  opacity: 1;
+  visibility: visible;
+  transition: 0.4s;
+}
+
+.editPostButton,
+.deletePostButton {
+  color: #13315e;
+  cursor: pointer;
+}
