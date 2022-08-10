@@ -1,9 +1,14 @@
-import React from "react";
+import React, { FC } from "react";
 import classes from "./ClosedMenu.module.scss";
 
-const ClosedMenu = () => {
+type PropsType = {
+  handleMenu: () => void;
+  openMenu: boolean;
+};
+
+const ClosedMenu: FC<PropsType> = ({ handleMenu }) => {
   return (
-    <div className={classes.close__menu}>
+    <div onClick={handleMenu} className={classes.close__menu}>
       <span>МЕНЮ</span>
     </div>
   );

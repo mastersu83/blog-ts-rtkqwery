@@ -16,3 +16,12 @@
     box-shadow: 0 0 2px 0 black;
   }
 }
+
+.disabled {
+  background-color: #7f8081;
+
+  &:hover {
+    background-color: #7f8081;
+    box-shadow: none;
+  }
+}

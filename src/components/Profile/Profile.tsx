@@ -1,15 +1,22 @@
-import React from "react";
+import React, { FC } from "react";
 import classes from "./Profile.module.scss";
 import Header from "../Header/Header";
 import ItemsList from "../ItemsList/ItemsList";
-import Post from "../Post/Post";
 import Comment from "../Comment/Comment";
+import { useGetAllCommentsQuery } from "../../redux/api/commentsApi";
 
-const Profile = () => {
-  const content = true;
+type PropsType = {
+  handlePopup: () => void;
+  openPopup: boolean;
+};
+
+const Profile: FC<PropsType> = ({ openPopup, handlePopup }) => {
+  const content = false;
+  const { data, isSuccess } = useGetAllCommentsQuery({});
+  console.log(data);
   return (
     <div className={classes.profile}>
-      <Header />
+      <Header handlePopup={handlePopup} openPopup={openPopup} />
       <div className={classes.profile__content}>
         <div className={classes.profile__name}>{"auth.user.fullName"}</div>
         <div className={classes.profile__dateRegister}>
@@ -26,13 +33,13 @@ const Profile = () => {
           {content ? (
             <>
               <div>
-                <Post />
-                <Post />
-                <Post />
-                <Post />
-                <Post />
-                <Post />
-                <Post />
+                {/*<Post />*/}
+                {/*<Post />*/}
+                {/*<Post />*/}
+                {/*<Post />*/}
+                {/*<Post />*/}
+                {/*<Post />*/}
+                {/*<Post />*/}
               </div>
               {/*<div className={classes.posts__pagination}>*/}
               {/*  <Pagination*/}
@@ -47,10 +54,8 @@ const Profile = () => {
           ) : (
             <>
               <div>
-                <Comment />
-                <Comment />
-                <Comment />
-                <Comment />
+                {isSuccess &&
+                  data.map((comment) => <Comment key={comment._id} />)}
               </div>
               {/*<div className={classes.posts__pagination}>*/}
               {/*  <Pagination*/}

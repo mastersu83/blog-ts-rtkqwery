@@ -1,25 +1,22 @@
-import React from "react";
+import React, { FC } from "react";
 import classes from "./Posts.module.scss";
-import Alert from "../Alert/Alert";
 import Header from "../Header/Header";
 import Post from "../Post/Post";
 import ItemsList from "../ItemsList/ItemsList";
+import { useGetAllPostsQuery } from "../../redux/api/postsApi";
 
-const Posts = () => {
+type PropsType = {
+  handlePopup: () => void;
+  openPopup: boolean;
+};
+
+const Posts: FC<PropsType> = ({ openPopup, handlePopup }) => {
+  const { data, isSuccess } = useGetAllPostsQuery({});
   return (
     <div className={classes.posts}>
-      <Alert />
-      <Header />
+      <Header handlePopup={handlePopup} openPopup={openPopup} />
       <ItemsList>
-        <Post />
-        <Post />
-        <Post />
-        <Post />
-        <Post />
-        <Post />
-        <Post />
-        <Post />
-        <Post />
+        {isSuccess && data.map((post) => <Post key={post._id} {...post} />)}
       </ItemsList>
       {/*<div className={classes.posts__pagination}>*/}
       {/*  <Pagination*/}

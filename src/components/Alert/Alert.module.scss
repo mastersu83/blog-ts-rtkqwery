@@ -1,10 +1,10 @@
 .alert {
   width: 200px;
-  height: 60px;
-  background-color: rgba(7, 26, 145, 0.68);
+  height: 100px;
+  background-color: #071a91ff;
   position: absolute;
   top: 20px;
-  left: 40%;
+  left: 45%;
   padding: 10px 20px;
   border-radius: 8px;
   color: #ffffff;
@@ -16,6 +16,7 @@
   opacity: 0;
   visibility: hidden;
   transition: all 0.5s ease;
+  z-index: 100;
   &__open {
     opacity: 1;
     visibility: visible;

@@ -1,14 +1,28 @@
-import React from "react";
+import React, { FC } from "react";
 
 import classes from "./Header.module.scss";
 
 import search from "../../assets/img/search.svg";
 import { Link } from "react-router-dom";
 import addPost from "../../assets/img/addPost.svg";
-import logIn from "../../assets/img/logIn.svg";
-import logOut from "../../assets/img/logOut.svg";
+import logInIcon from "../../assets/img/logIn.svg";
+import logOutIcon from "../../assets/img/logOut.svg";
+import { useAppDispatch, useAppSelector } from "../../hooks/appHooks";
+import { logOut } from "../../redux/slices/authSlice";
 
-const Header = () => {
+type PropsType = {
+  handlePopup: () => void;
+  openPopup: boolean;
+};
+
+const Header: FC<PropsType> = ({ openPopup, handlePopup }) => {
+  const dispatch = useAppDispatch();
+  const { isAuth } = useAppSelector((state) => state.auth);
+
+  const onLogOut = () => {
+    dispatch(logOut());
+  };
+
   return (
     <div className={classes.posts__header}>
       <Link to="/">
@@ -31,20 +45,19 @@ const Header = () => {
         </Link>
 
         <img
-          src={logIn}
+          onClick={isAuth ? onLogOut : handlePopup}
+          src={isAuth ? logOutIcon : logInIcon}
           alt=""
           className={classes.posts__headerIcon}
-          title="Вход"
+          title={isAuth ? "Вход" : "Выход"}
         />
 
-        <Link to="/">
-          <img
-            src={logOut}
-            alt=""
-            className={classes.posts__headerIcon}
-            title="Выход"
-          />
-        </Link>
+        {/*<img*/}
+        {/*  src={logOut}*/}
+        {/*  alt=""*/}
+        {/*  className={classes.posts__headerIcon}*/}
+        {/*  title="Выход"*/}
+        {/*/>*/}
       </div>
     </div>
   );
