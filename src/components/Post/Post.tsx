@@ -5,19 +5,35 @@ import { Link } from "react-router-dom";
 import EditBlock from "../../common/EditBlock";
 import { IPost } from "../../types/postType";
 import { getDate } from "../../utils/dateFormater";
+import { useAppSelector } from "../../hooks/appHooks";
 
-const Post: FC<IPost> = ({
-  _id,
-  title,
-  description,
-  views,
-  photoUrl,
-  createdAt,
-}) => {
+type PostPropsType = {
+  post: IPost;
+  removePost: (id: string) => void;
+  getEditedPost: (id: string) => void;
+};
+
+const Post: FC<PostPropsType> = ({ post, removePost, getEditedPost }) => {
+  const { _id, title, description, views, photoUrl, createdAt, user } = post;
+  const { user: authUser } = useAppSelector((state) => state.auth);
+
+  const handleRemovePost = () => {
+    removePost(_id);
+  };
+
+  const handleEditedPost = () => {
+    getEditedPost(_id);
+  };
+
   return (
     <div className={`${classes.posts__item} ${classes.activePost}`}>
       <div className={classes.posts__itemPost}>
-        <EditBlock showEditPostBlock={true} />
+        <EditBlock
+          showEditPostBlock={user._id === authUser._id}
+          handleRemove={handleRemovePost}
+          handleEdited={handleEditedPost}
+          editPost={true}
+        />
         <Link to={`/full-post/${_id}`}>
           <div className={classes.posts__itemTitle}>{title}</div>
         </Link>

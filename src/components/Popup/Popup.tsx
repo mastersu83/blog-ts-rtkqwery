@@ -1,61 +1,125 @@
-import React, { ChangeEvent, FC, useEffect, useState } from "react";
+import React, { FC, useEffect, useState } from "react";
 
 import classes from "./Popup.module.scss";
 
 import closeIcon from "../../assets/img/closePopup.svg";
-import Button from "../../common/Button";
-import { useLoginMutation } from "../../redux/api/authApi";
+import { useLoginMutation, useRegisterMutation } from "../../redux/api/authApi";
 import { useAppDispatch } from "../../hooks/appHooks";
-import { setUser } from "../../redux/slices/authSlice";
+import { loginUser } from "../../redux/slices/authSlice";
 import Alert from "../Alert/Alert";
+import { useForm } from "react-hook-form";
+import PopupForm from "../../common/PopupForm/PopupForm";
+import PopupFormInput from "../../common/PopupForm/PopupFormInput";
+import { PopupFormValuesType } from "../../types/formValueType";
 
 type PropsType = {
   handlePopup: () => void;
   openPopup: boolean;
 };
 
-type FormValuesType = {
-  email: string;
-  password: string;
-  fullName: string;
-};
-
 const Popup: FC<PropsType> = ({ openPopup, handlePopup }) => {
   const dispatch = useAppDispatch();
   const [contentPopup, setContentPopup] = useState<boolean>(false);
   const [errorText, setErrorText] = useState<string>("");
-  const [inputs, setInputs] = useState<{ email: string; password: string }>({
-    email: "",
-    password: "",
+
+  const {
+    handleSubmit,
+    register,
+    formState: { errors, isValid },
+    reset,
+    watch,
+  } = useForm<PopupFormValuesType>({
+    mode: "all",
   });
 
-  const [login, { data, isSuccess, isError }] = useLoginMutation();
+  const [
+    login,
+    {
+      data: loginData,
+      isSuccess: loginIsSuccess,
+      isError: loginIsError,
+      reset: loginReset,
+      error: loginError,
+    },
+  ] = useLoginMutation();
+  const [
+    registration,
+    {
+      data: registerData,
+      isSuccess: registerIsSuccess,
+      error: registerError,
+      reset: registerReset,
+    },
+  ] = useRegisterMutation();
 
-  const email: string = "master3@mail.ru";
-  const password: string = "123456";
-
-  const onInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setInputs({ ...inputs, [name]: value });
-  };
-
-  const onLogin = () => {
-    login({ email: inputs.email, password: inputs.password });
+  const onSubmit = (data: PopupFormValuesType) => {
+    const { email, password, fullName } = data;
+    if (watch("fullName")) {
+      loginReset();
+      registration({ email, password, fullName });
+    } else {
+      login({ email, password });
+    }
+    reset();
     handlePopup();
   };
 
+  const handleContentPopup = () => {
+    setContentPopup(!contentPopup);
+    reset();
+  };
+
   useEffect(() => {
-    if (isSuccess && data) {
-      localStorage.setItem("token", data.token ? data.token : "");
-      dispatch(setUser(data));
-    } else if (isError) {
-      setErrorText("Пользователь не найден");
+    if (loginIsSuccess && loginData) {
+      localStorage.setItem("token", loginData.token ? loginData.token : "");
+      dispatch(loginUser());
+    } else if (registerData) {
+      setErrorText("Вы зарегистрировались, теперь можете войти");
     }
-  }, [isError, isSuccess, data]);
+  }, [loginIsError, loginIsSuccess, loginData, registerData]);
+
+  if (registerError || loginError) {
+    if (registerError) {
+      if ("status" in registerError) {
+        const errMsg =
+          "error" in registerError
+            ? registerError.error
+            : JSON.stringify(registerError.data).split(":")[1].slice(1, -2);
+        return (
+          <Alert
+            text={errMsg}
+            isError={true}
+            setErrorText={setErrorText}
+            resetError={registerReset}
+          />
+        );
+      }
+    } else if (loginError) {
+      if ("status" in loginError) {
+        const errMsg =
+          "error" in loginError
+            ? loginError.error
+            : JSON.stringify(loginError.data).split(":")[1].slice(1, -2);
+        return (
+          <Alert
+            text={errMsg}
+            isError={true}
+            setErrorText={setErrorText}
+            resetError={loginReset}
+          />
+        );
+      }
+    }
+  }
 
   if (errorText) {
     return (
-      <Alert text={errorText} isError={isError} setErrorText={setErrorText} />
+      <Alert
+        text={errorText}
+        isError={true}
+        setErrorText={setErrorText}
+        resetError={reset}
+      />
     );
   }
 
@@ -70,59 +134,55 @@ const Popup: FC<PropsType> = ({ openPopup, handlePopup }) => {
             alt=""
           />
           <div className={classes.popup__inner}>
-            <form id="formEdit" className={classes.popup__formEdit}>
-              {!contentPopup ? (
-                <div className={classes.popup__title}>Вход в аккаунт</div>
-              ) : (
-                <>
-                  <div className={classes.popup__title}>Регистрация</div>
-                  <div>Имя и Фамилия</div>
-                  <input
-                    name="fullName"
-                    className={classes.popup__input}
-                    type="text"
-                    placeholder="Введите Имя и Фамилию..."
-                  />
-                </>
+            {!contentPopup ? (
+              <div className={classes.popup__title}>Вход в аккаунт</div>
+            ) : (
+              <div className={classes.popup__title}>Регистрация</div>
+            )}
+
+            <PopupForm
+              onSubmit={handleSubmit(onSubmit)}
+              contentPopup={contentPopup}
+              disabled={isValid}
+            >
+              {contentPopup && (
+                <PopupFormInput
+                  name="fullName"
+                  label="Имя и Фамилия"
+                  register={register}
+                  errors={errors}
+                  type="text"
+                  placeholder="Введите Имя и Фамилию..."
+                />
               )}
-              <div>Email</div>
-              <input
+              <PopupFormInput
                 name="email"
-                onChange={onInputChange}
-                className={classes.popup__input}
+                label="Email"
+                register={register}
+                errors={errors}
                 type="email"
                 placeholder="Введите Email..."
-                required
               />
-              <div>Пароль</div>
-              <input
-                onChange={onInputChange}
+              <PopupFormInput
                 name="password"
-                className={classes.popup__input}
+                label="Пароль"
+                register={register}
+                errors={errors}
                 type="password"
                 placeholder="Введите пароль..."
               />
-              <div className={classes.popup__btn}>
-                <Button
-                  disabled={
-                    inputs.email.length > 0 && inputs.password.length > 0
-                  }
-                  onLogin={onLogin}
-                  text={!contentPopup ? "Войти" : "Зарегистрироваться"}
-                />
-              </div>
-            </form>
+            </PopupForm>
             <div>
               {contentPopup ? (
                 <span
-                  onClick={() => setContentPopup(!contentPopup)}
+                  onClick={handleContentPopup}
                   className={classes.popup__link}
                 >
                   Войти:
                 </span>
               ) : (
                 <div
-                  onClick={() => setContentPopup(!contentPopup)}
+                  onClick={handleContentPopup}
                   className={classes.popup__link}
                 >
                   Зарегистрироваться:

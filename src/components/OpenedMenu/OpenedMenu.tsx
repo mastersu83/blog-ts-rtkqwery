@@ -1,6 +1,9 @@
-import React, { FC } from "react";
+import React, { FC, useEffect, useState } from "react";
 import classes from "./OpenedMenu.module.scss";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "../../hooks/appHooks";
+import { getDate } from "../../utils/dateFormater";
+import { logOut } from "../../redux/slices/authSlice";
 
 const links: { id: number; link: string; path: string }[] = [
   { id: 1, link: "Главная", path: "/" },
@@ -15,8 +18,25 @@ type PropsType = {
 };
 
 const OpenedMenu: FC<PropsType> = ({ openMenu, handleMenu, handlePopup }) => {
-  const auth = false;
-  const active = false;
+  const { pathname } = useLocation();
+
+  const dispatch = useAppDispatch();
+  const [active, setActive] = useState(pathname);
+
+  const {
+    user: { fullName, createdAt },
+    isAuth,
+  } = useAppSelector((state) => state.auth);
+
+  const onLogOut = () => {
+    dispatch(logOut());
+    handleMenu();
+  };
+
+  useEffect(() => {
+    setActive(pathname);
+  }, [pathname]);
+
   return (
     <div
       className={`${classes.menu} ${classes.open} ${
@@ -28,25 +48,27 @@ const OpenedMenu: FC<PropsType> = ({ openMenu, handleMenu, handlePopup }) => {
           Закрыть
         </div>
         <div className={classes.menu__navbar}>
-          {auth ? (
+          {isAuth ? (
             <>
-              <div className={classes.menu__name}>{"auth.user.fullName"}</div>
+              <div className={classes.menu__name}>{fullName}</div>
               <div className={classes.menu__date}>
-                Дата регистрации: {"getDate(auth.user.createdAt)"}
+                Дата регистрации: {getDate(String(createdAt))}
               </div>
               {links.map((obj) => (
                 <Link
                   key={obj.id}
-                  onClick={handleMenu}
+                  // onClick={handleMenu}
                   to={obj.path}
                   className={`${classes.menu__link} ${
-                    active ? classes.active__menuLink : ""
+                    active === obj.path ? classes.active__menuLink : ""
                   }`}
                 >
                   {obj.link}
                 </Link>
               ))}
-              <div className={classes.menu__link}>Выйти</div>
+              <div onClick={onLogOut} className={classes.menu__link}>
+                Выйти
+              </div>
             </>
           ) : (
             <>

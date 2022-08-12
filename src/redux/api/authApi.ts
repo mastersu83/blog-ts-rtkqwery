@@ -29,10 +29,18 @@ export const authApi = createApi({
         body: { email, password },
       }),
     }),
-    register: builder.mutation<IUser, string>({
-      query: () => ({
+    register: builder.mutation<
+      IUser,
+      {
+        email: string;
+        password: string;
+        fullName: string;
+      }
+    >({
+      query: ({ email, password, fullName }) => ({
         url: `register`,
         method: "POST",
+        body: { email, password, fullName },
       }),
     }),
     auth: builder.query<IUser, unknown>({
@@ -43,4 +51,5 @@ export const authApi = createApi({
   }),
 });
 
-export const { useAuthQuery, useLoginMutation } = authApi;
+export const { useLazyAuthQuery, useLoginMutation, useRegisterMutation } =
+  authApi;

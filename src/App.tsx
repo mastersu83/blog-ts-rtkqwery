@@ -1,26 +1,26 @@
 import Posts from "./components/Posts/Posts";
 import About from "./components/About/About";
 import ClosedMenu from "./components/ClosedMenu/ClosedMenu";
-import { Route, Routes, useLocation } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import FullPost from "./components/FullPost/FullPost";
 import Profile from "./components/Profile/Profile";
 import CreatePost from "./components/CreatePost/CreatePost";
 import React, { useEffect, useState } from "react";
 import Popup from "./components/Popup/Popup";
 import OpenedMenu from "./components/OpenedMenu/OpenedMenu";
-import Preloader from "./components/Preloader/Preloader";
 import "antd/dist/antd.css";
-import { useAuthQuery } from "./redux/api/authApi";
-import { useAppDispatch } from "./hooks/appHooks";
+import { useLazyAuthQuery } from "./redux/api/authApi";
+import { useAppDispatch, useAppSelector } from "./hooks/appHooks";
 import { setUser } from "./redux/slices/authSlice";
 
 const App = () => {
+  const { isAuth } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
   const { pathname } = useLocation();
   const [openPopup, setOpenPopup] = useState<boolean>(false);
   const [openMenu, setOpenMenu] = useState<boolean>(false);
 
-  const { data, isSuccess } = useAuthQuery({});
+  const [authMe, { data, isSuccess }] = useLazyAuthQuery();
 
   const handlePopup = () => {
     setOpenPopup(!openPopup);
@@ -31,10 +31,13 @@ const App = () => {
   };
 
   useEffect(() => {
-    if (isSuccess && data) {
-      dispatch(setUser(data));
+    if (localStorage.getItem("token")) {
+      authMe({});
+      if (isSuccess && data) {
+        dispatch(setUser(data));
+      }
     }
-  }, [data]);
+  }, [data, isAuth]);
 
   return (
     <div className="root">
@@ -43,17 +46,21 @@ const App = () => {
           <Route path="/full-post/:id" element={<FullPost />} />
           <Route path="/" element={<About />} />
           <Route path={"/create-post"} element={<CreatePost />} />
-          <Route path="/posts" element={<Preloader />} />
+          <Route path="*" element={<div>notfound</div>} />
 
           <Route
             path="/profile"
             element={
-              <Profile handlePopup={handlePopup} openPopup={openPopup} />
+              isAuth ? (
+                <Profile openPopup={openPopup} handlePopup={handlePopup} />
+              ) : (
+                <Navigate to="/" />
+              )
             }
           />
         </Routes>
         {pathname !== "/profile" && (
-          <Posts handlePopup={handlePopup} openPopup={openPopup} />
+          <Posts openPopup={openPopup} handlePopup={handlePopup} />
         )}
         <ClosedMenu handleMenu={handleMenu} openMenu={openMenu} />
         <Popup handlePopup={handlePopup} openPopup={openPopup} />

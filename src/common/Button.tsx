@@ -3,22 +3,34 @@ import classes from "./Button.module.scss";
 
 interface ButtonPropsTypes {
   text: string;
-  onLogin?: () => void;
   disabled?: boolean;
+  name?: string;
+  cancel?: () => void;
 }
 
-const Button: FC<ButtonPropsTypes> = ({ text, onLogin, disabled }) => {
-  console.log(disabled);
+const Button: FC<ButtonPropsTypes> = ({ text, disabled, name, cancel }) => {
   return (
-    <button
-      disabled={!disabled}
-      onClick={onLogin}
-      className={`${classes.yellow__button} ${
-        !disabled ? classes.disabled : ""
-      }`}
-    >
-      {text}
-    </button>
+    <>
+      {name !== "Cancel" ? (
+        <button
+          disabled={!disabled}
+          className={`${classes.yellow__button} ${
+            !disabled ? classes.disabled : ""
+          }`}
+        >
+          {text}
+        </button>
+      ) : (
+        <div
+          onClick={cancel}
+          className={`${classes.yellow__button} ${
+            !disabled ? classes.disabled : ""
+          }`}
+        >
+          {text}
+        </div>
+      )}
+    </>
   );
 };
 

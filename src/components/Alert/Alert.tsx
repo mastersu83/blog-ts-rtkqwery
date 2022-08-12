@@ -5,11 +5,14 @@ const Alert = ({
   text = "",
   isError,
   setErrorText,
+  resetError,
 }: {
   text: string;
   isError: boolean;
   setErrorText: (e: string) => void;
+  resetError?: () => void;
 }) => {
+  console.log("alert");
   const [needLogin, setNeedLogin] = React.useState(false);
 
   React.useEffect(() => {
@@ -17,6 +20,7 @@ const Alert = ({
       setNeedLogin(true);
       setTimeout(() => {
         setErrorText("");
+        resetError && resetError();
         setNeedLogin(false);
       }, 2000);
     }

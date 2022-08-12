@@ -6,24 +6,8 @@ type InitialStateType = {
   isAuth: boolean;
 };
 
-const defaultUser = {
-  _id: "",
-  fullName: "",
-  email: "",
-  createdAt: "",
-  updatedAt: "",
-  __v: 0,
-};
-
 const initialState: InitialStateType = {
-  user: {
-    _id: "",
-    fullName: "",
-    email: "",
-    createdAt: "",
-    updatedAt: "",
-    __v: 0,
-  },
+  user: {} as IUser,
   isAuth: false,
 };
 
@@ -38,11 +22,14 @@ export const authSlice = createSlice({
       }
     },
     logOut: (state: InitialStateType) => {
-      state.user = defaultUser;
+      state.user = {} as IUser;
       state.isAuth = false;
       localStorage.removeItem("token");
+    },
+    loginUser: (state: InitialStateType) => {
+      state.isAuth = true;
     },
   },
 });
 
-export const { setUser, logOut } = authSlice.actions;
+export const { setUser, logOut, loginUser } = authSlice.actions;

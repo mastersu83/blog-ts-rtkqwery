@@ -1,45 +1,75 @@
-import React, { FC } from "react";
+import React, { FC, useState } from "react";
 import classes from "./Profile.module.scss";
 import Header from "../Header/Header";
 import ItemsList from "../ItemsList/ItemsList";
 import Comment from "../Comment/Comment";
-import { useGetAllCommentsQuery } from "../../redux/api/commentsApi";
+import {
+  useGetAllUserCommentsQuery,
+  useRemoveCommentMutation,
+} from "../../redux/api/commentsApi";
+import {
+  useGetAllUserPostsQuery,
+  useLazyGetOnePostQuery,
+  useRemovePostMutation,
+} from "../../redux/api/postsApi";
+import Post from "../Post/Post";
+import { useAppSelector } from "../../hooks/appHooks";
+import { getDate } from "../../utils/dateFormater";
 
 type PropsType = {
   handlePopup: () => void;
   openPopup: boolean;
 };
 
-const Profile: FC<PropsType> = ({ openPopup, handlePopup }) => {
-  const content = false;
-  const { data, isSuccess } = useGetAllCommentsQuery({});
-  console.log(data);
+const Profile: FC<PropsType> = ({ handlePopup, openPopup }) => {
+  const [active, setActive] = useState("Статьи");
+  const {
+    user: { fullName, createdAt, _id },
+  } = useAppSelector((state) => state.auth);
+  const { data: comments, isSuccess: isSuccessComments } =
+    useGetAllUserCommentsQuery(_id);
+  const { data: posts, isSuccess: isSuccessPosts } =
+    useGetAllUserPostsQuery(_id);
+
+  const [removePost] = useRemovePostMutation();
+  const [removeComment] = useRemoveCommentMutation();
+  const [getEditedPost] = useLazyGetOnePostQuery();
+
   return (
     <div className={classes.profile}>
       <Header handlePopup={handlePopup} openPopup={openPopup} />
       <div className={classes.profile__content}>
-        <div className={classes.profile__name}>{"auth.user.fullName"}</div>
+        <div className={classes.profile__name}>{fullName}</div>
         <div className={classes.profile__dateRegister}>
-          Дата регистрации: <span>{"getDate(auth.user.createdAt)"}</span>
+          Дата регистрации: <span>{getDate(String(createdAt))}</span>
         </div>
         <div className={classes.profile__buttons}>
-          <button className={`${classes.profile__btn} ${classes.active}`}>
-            Статьи
-          </button>
-          <button className={`${classes.profile__btn}`}>Комментарии</button>
+          {["Статьи", "Комментарии"].map((text) => (
+            <span
+              key={text}
+              onClick={() => setActive(text)}
+              className={`${classes.profile__btn} ${
+                text === active ? classes.active : ""
+              }`}
+            >
+              {text}
+            </span>
+          ))}
         </div>
 
         <ItemsList>
-          {content ? (
+          {active === "Статьи" ? (
             <>
               <div>
-                {/*<Post />*/}
-                {/*<Post />*/}
-                {/*<Post />*/}
-                {/*<Post />*/}
-                {/*<Post />*/}
-                {/*<Post />*/}
-                {/*<Post />*/}
+                {isSuccessPosts &&
+                  posts.map((post) => (
+                    <Post
+                      key={post._id}
+                      post={post}
+                      removePost={removePost}
+                      getEditedPost={getEditedPost}
+                    />
+                  ))}
               </div>
               {/*<div className={classes.posts__pagination}>*/}
               {/*  <Pagination*/}
@@ -54,8 +84,14 @@ const Profile: FC<PropsType> = ({ openPopup, handlePopup }) => {
           ) : (
             <>
               <div>
-                {isSuccess &&
-                  data.map((comment) => <Comment key={comment._id} />)}
+                {isSuccessComments &&
+                  comments.map((comment) => (
+                    <Comment
+                      comment={comment}
+                      key={comment._id}
+                      removeComment={removeComment}
+                    />
+                  ))}
               </div>
               {/*<div className={classes.posts__pagination}>*/}
               {/*  <Pagination*/}

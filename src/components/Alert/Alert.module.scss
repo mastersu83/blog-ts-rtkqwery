@@ -1,13 +1,15 @@
 .alert {
-  width: 200px;
-  height: 100px;
+  max-width: 300px;
+  width: max-content;
+  height: min-content;
   background-color: #071a91ff;
   position: absolute;
   top: 20px;
-  left: 45%;
+  left: 20px;
   padding: 10px 20px;
   border-radius: 8px;
   color: #ffffff;
+  font-weight: 500;
   font-size: 20px;
   text-align: center;
   display: flex;

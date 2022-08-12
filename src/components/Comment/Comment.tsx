@@ -1,19 +1,46 @@
-import React from "react";
+import React, { FC } from "react";
 import classes from "./Comment.module.scss";
 import EditBlock from "../../common/EditBlock";
+import { IComments } from "../../types/commentsType";
+import { getDate } from "../../utils/dateFormater";
+import { useAppDispatch, useAppSelector } from "../../hooks/appHooks";
+import { setEditComment } from "../../redux/slices/commentsSlice";
 
-const Comment = () => {
+type CommentPropsType = {
+  comment: IComments;
+  removeComment: (id: string) => void;
+};
+
+const Comment: FC<CommentPropsType> = ({ comment, removeComment }) => {
+  const dispatch = useAppDispatch();
+  const { user: authUser } = useAppSelector((state) => state.auth);
+
+  const { user, createdAt, text, _id } = comment;
+
+  const handleRemoveComment = () => {
+    removeComment(_id);
+  };
+
+  const handleEditedComment = () => {
+    dispatch(setEditComment(comment));
+  };
+
   return (
     <div className={classes.full__postComment}>
-      <EditBlock showEditPostBlock={true} />
+      <EditBlock
+        showEditPostBlock={user._id === authUser._id}
+        handleRemove={handleRemoveComment}
+        handleEdited={handleEditedComment}
+        editPost={false}
+      />
       <div className={classes.full__postCommentHeader}>
-        <div className={classes.full__postCommentName}>{"user.fullName"}</div>
+        <div className={classes.full__postCommentName}>{user.fullName}</div>
         <div className={classes.full__postCommentDate}>
-          {"getDate(createdAt)"}
+          {getDate(String(createdAt))}
         </div>
       </div>
       <div className={classes.full__postCommentText}>
-        <span>{"text"}</span>
+        <span>{text}</span>
       </div>
     </div>
   );

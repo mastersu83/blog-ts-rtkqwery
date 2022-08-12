@@ -16,6 +16,14 @@
 
   &__headerTitle {
     color: #13315e;
+    span {
+      color: #ffffff;
+      background-color: #0a3465;
+      border-radius: 5px;
+      box-shadow: 3px 3px 6px 0 #888;
+      padding: 10px;
+      margin-right: 10px;
+    }
   }
 
   &__headerIcons {

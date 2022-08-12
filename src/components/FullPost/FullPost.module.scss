@@ -86,6 +86,7 @@
     resize: none;
   }
   &__addCommentBtn {
-    text-align: right;
+    display: flex;
+    justify-content: end;
   }
 }
