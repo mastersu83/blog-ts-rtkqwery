@@ -52,16 +52,14 @@ const App = () => {
             path="/profile"
             element={
               isAuth ? (
-                <Profile openPopup={openPopup} handlePopup={handlePopup} />
+                <Profile handlePopup={handlePopup} />
               ) : (
                 <Navigate to="/" />
               )
             }
           />
         </Routes>
-        {pathname !== "/profile" && (
-          <Posts openPopup={openPopup} handlePopup={handlePopup} />
-        )}
+        {pathname !== "/profile" && <Posts handlePopup={handlePopup} />}
         <ClosedMenu handleMenu={handleMenu} openMenu={openMenu} />
         <Popup handlePopup={handlePopup} openPopup={openPopup} />
         <OpenedMenu

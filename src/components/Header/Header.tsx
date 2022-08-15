@@ -10,13 +10,14 @@ import logOutIcon from "../../assets/img/logOut.svg";
 import { useAppDispatch, useAppSelector } from "../../hooks/appHooks";
 import { logOut } from "../../redux/slices/authSlice";
 import Alert from "../Alert/Alert";
+import { setEditPost } from "../../redux/slices/postsSlice";
+import { IPost } from "../../types/postType";
 
 type PropsType = {
   handlePopup: () => void;
-  openPopup: boolean;
 };
 
-const Header: FC<PropsType> = ({ handlePopup, openPopup }) => {
+const Header: FC<PropsType> = ({ handlePopup }) => {
   const dispatch = useAppDispatch();
   const [errorText, setErrorText] = useState<string>("");
 
@@ -27,11 +28,14 @@ const Header: FC<PropsType> = ({ handlePopup, openPopup }) => {
 
   const onLogOut = () => {
     dispatch(logOut());
-    console.log("hello");
   };
 
   const needLogin = () => {
     setErrorText("Вы не авторизованны");
+  };
+
+  const getEditPost = () => {
+    dispatch(setEditPost({} as IPost));
   };
 
   return (
@@ -60,7 +64,7 @@ const Header: FC<PropsType> = ({ handlePopup, openPopup }) => {
             title="Создать статью"
           />
         ) : (
-          <Link to="/create-post">
+          <Link onClick={getEditPost} to="/create-post">
             <img
               src={addPost}
               alt=""

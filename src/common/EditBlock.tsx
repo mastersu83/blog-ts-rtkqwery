@@ -2,7 +2,6 @@ import React, { FC } from "react";
 import classes from "./EditBlock.module.scss";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-import { useAppSelector } from "../hooks/appHooks";
 
 interface EditBlockPropsTypes {
   showEditPostBlock: boolean;

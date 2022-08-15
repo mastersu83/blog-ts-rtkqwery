@@ -12,7 +12,7 @@ import { removeEditPost } from "../../redux/slices/postsSlice";
 
 const CreatePost = () => {
   const dispatch = useAppDispatch();
-  const { post: editedPost, isEdit } = useAppSelector((state) => state.post);
+  const { post: editedPost } = useAppSelector((state) => state.post);
 
   const [createPost] = useCreatePostMutation();
   const [editPost] = useEditPostMutation();
@@ -29,7 +29,7 @@ const CreatePost = () => {
 
   const onSubmit = (data: CreatePostFormValuesType) => {
     const { file, title, text, description } = data;
-    if (!isEdit) {
+    if (!editedPost?._id) {
       createPost({ title, text, description, file });
     } else {
       editPost({ data, postId: editedPost._id });
@@ -43,13 +43,15 @@ const CreatePost = () => {
     dispatch(removeEditPost());
   };
 
+  console.log(editedPost?._id ? "yes" : "no");
+
   useEffect(() => {
-    if (isEdit) {
+    if (editedPost) {
       setValue("title", editedPost.title);
       setValue("text", editedPost.text);
       setValue("description", editedPost.description);
     }
-  }, [isEdit, editedPost]);
+  }, [editedPost]);
 
   return (
     <>
@@ -105,23 +107,23 @@ const CreatePost = () => {
           {errors?.text && <p>{errors?.text?.message || "Error"}</p>}
         </div>
         <div className={classes.create__btn}>
-          {isEdit ? (
+          {editedPost?._id ? (
             <Button
               name="Create"
-              disabled={isEdit || isValid}
+              disabled={(editedPost?._id && true) || isValid}
               text="Сохранить"
             />
           ) : (
             <Button
               name="Create"
-              disabled={isEdit || isValid}
+              disabled={(editedPost?._id && true) || isValid}
               text="Опубликовать"
             />
           )}
 
           <Button
             name="Cancel"
-            disabled={isEdit || isValid}
+            disabled={(editedPost?._id && true) || isValid}
             text="Отменить"
             cancel={cancel}
           />

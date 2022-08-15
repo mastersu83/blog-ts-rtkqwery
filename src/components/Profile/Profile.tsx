@@ -18,10 +18,9 @@ import { Pagination } from "antd";
 
 type PropsType = {
   handlePopup: () => void;
-  openPopup: boolean;
 };
 
-const Profile: FC<PropsType> = ({ handlePopup, openPopup }) => {
+const Profile: FC<PropsType> = ({ handlePopup }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [active, setActive] = useState("Статьи");
   const {
@@ -46,7 +45,7 @@ const Profile: FC<PropsType> = ({ handlePopup, openPopup }) => {
 
   return (
     <div className={classes.profile}>
-      <Header handlePopup={handlePopup} openPopup={openPopup} />
+      <Header handlePopup={handlePopup} />
       <div className={classes.profile__content}>
         <div className={classes.profile__name}>{fullName}</div>
         <div className={classes.profile__dateRegister}>

@@ -14,14 +14,13 @@ import { Pagination } from "antd";
 
 type PropsType = {
   handlePopup: () => void;
-  openPopup: boolean;
 };
 
-const Posts: FC<PropsType> = ({ handlePopup, openPopup }) => {
+const Posts: FC<PropsType> = ({ handlePopup }) => {
   const dispatch = useAppDispatch();
   const [currentPage, setCurrentPage] = useState(1);
 
-  const { post, isEdit } = useAppSelector((state) => state.post);
+  const { post } = useAppSelector((state) => state.post);
   const [getAllPost, { data, isSuccess, isFetching }] = useLazyGetAllPostsQuery(
     {}
   );
@@ -33,10 +32,10 @@ const Posts: FC<PropsType> = ({ handlePopup, openPopup }) => {
   };
 
   useEffect(() => {
-    if (isEdit) {
+    if (post._id) {
       dispatch(setEditPost(post));
     }
-  }, [isEdit]);
+  }, [post._id]);
 
   useEffect(() => {
     getAllPost(currentPage);
@@ -45,7 +44,7 @@ const Posts: FC<PropsType> = ({ handlePopup, openPopup }) => {
   return (
     <>
       <div className={classes.posts}>
-        <Header handlePopup={handlePopup} openPopup={openPopup} />
+        <Header handlePopup={handlePopup} />
         {isFetching ? (
           <PostSkeleton />
         ) : (

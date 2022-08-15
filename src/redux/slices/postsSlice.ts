@@ -3,12 +3,10 @@ import { IPost } from "../../types/postType";
 
 type InitialStateType = {
   post: IPost;
-  isEdit: boolean;
 };
 
 const initialState: InitialStateType = {
   post: {} as IPost,
-  isEdit: false,
 };
 
 export const postsSlice = createSlice({
@@ -16,13 +14,10 @@ export const postsSlice = createSlice({
   initialState,
   reducers: {
     setEditPost: (state: InitialStateType, action: PayloadAction<IPost>) => {
-      state.isEdit = false;
       state.post = action.payload;
-      state.isEdit = true;
     },
     removeEditPost: (state: InitialStateType) => {
       state.post = {} as IPost;
-      state.isEdit = false;
     },
   },
 });
