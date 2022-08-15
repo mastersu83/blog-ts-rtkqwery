@@ -7,6 +7,7 @@ import { IPost } from "../../types/postType";
 import { getDate } from "../../utils/dateFormater";
 import { useAppDispatch, useAppSelector } from "../../hooks/appHooks";
 import { setEditPost } from "../../redux/slices/postsSlice";
+import { useLazyGetOnePostQuery } from "../../redux/api/postsApi";
 
 type PostPropsType = {
   post: IPost;
@@ -17,13 +18,18 @@ const Post: FC<PostPropsType> = ({ post, removePost }) => {
   const dispatch = useAppDispatch();
   const { _id, title, description, views, photoUrl, createdAt, user } = post;
   const { user: authUser } = useAppSelector((state) => state.auth);
+  const { post: editedPost } = useAppSelector((state) => state.post);
+  const [getOnePost, { data }] = useLazyGetOnePostQuery();
 
   const handleRemovePost = () => {
     removePost(_id);
   };
 
   const handleEditedPost = () => {
-    dispatch(setEditPost(post));
+    if (editedPost._id !== _id) {
+      getOnePost(_id);
+      dispatch(setEditPost(post));
+    }
   };
 
   return (
@@ -46,7 +52,9 @@ const Post: FC<PostPropsType> = ({ post, removePost }) => {
           </div>
           <div className={classes.posts__view}>
             <img src={view} alt="" className={classes.posts__viewIcon} />
-            <span className={classes.posts__viewCount}>{views}</span>
+            <span className={classes.posts__viewCount}>
+              {data ? data.views : views}
+            </span>
           </div>
         </div>
       </div>

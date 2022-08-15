@@ -69,8 +69,6 @@ const FullPost = () => {
     dispatch(removeEditComment());
   };
 
-  console.log(error);
-
   const cancel = () => {
     reset();
     dispatch(removeEditComment());
