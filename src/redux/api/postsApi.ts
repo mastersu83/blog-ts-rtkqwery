@@ -18,29 +18,28 @@ export const postsApi = createApi({
     },
   }),
   endpoints: (builder) => ({
-    getAllPosts: builder.query<IPost[], unknown>({
-      query: () => ({
+    getAllPosts: builder.query<{ total: number; items: IPost[] }, number>({
+      query: (currentPage) => ({
         url: `posts`,
         params: {
-          limit: 20,
+          limit: 5,
+          page: currentPage,
         },
       }),
       providesTags: ["Post"],
-      transformResponse(res: { items: IPost[]; total: number }) {
-        return res.items;
-      },
     }),
-    getAllUserPosts: builder.query<IPost[], string>({
-      query: (id) => ({
-        url: `posts?userId=${id}`,
+    getAllUserPosts: builder.query<
+      { items: IPost[]; total: number },
+      { userId: string; currentPage: number }
+    >({
+      query: ({ userId, currentPage }) => ({
+        url: `posts?userId=${userId}`,
         params: {
-          limit: 20,
+          limit: 5,
+          page: currentPage,
         },
       }),
       providesTags: ["Post"],
-      transformResponse(res: { items: IPost[]; total: number }) {
-        return res.items;
-      },
     }),
     getOnePost: builder.query<IPost, string>({
       query: (id) => ({
@@ -52,6 +51,17 @@ export const postsApi = createApi({
         url: `posts`,
         method: "POST",
         body: { title, description, text, file },
+      }),
+      invalidatesTags: [{ type: "Post" }],
+    }),
+    editPost: builder.mutation<
+      IPost,
+      { data: CreatePostFormValuesType; postId: string }
+    >({
+      query: ({ data, postId }) => ({
+        url: `posts/${postId}`,
+        method: "PATCH",
+        body: data,
       }),
       invalidatesTags: [{ type: "Post" }],
     }),
@@ -68,8 +78,9 @@ export const postsApi = createApi({
 export const {
   useGetAllPostsQuery,
   useGetOnePostQuery,
-  useLazyGetOnePostQuery,
   useCreatePostMutation,
   useRemovePostMutation,
-  useGetAllUserPostsQuery,
+  useLazyGetAllUserPostsQuery,
+  useLazyGetAllPostsQuery,
+  useEditPostMutation,
 } = postsApi;

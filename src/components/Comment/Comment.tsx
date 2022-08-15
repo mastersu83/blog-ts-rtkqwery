@@ -5,6 +5,7 @@ import { IComments } from "../../types/commentsType";
 import { getDate } from "../../utils/dateFormater";
 import { useAppDispatch, useAppSelector } from "../../hooks/appHooks";
 import { setEditComment } from "../../redux/slices/commentsSlice";
+import { useNavigate } from "react-router-dom";
 
 type CommentPropsType = {
   comment: IComments;
@@ -12,10 +13,12 @@ type CommentPropsType = {
 };
 
 const Comment: FC<CommentPropsType> = ({ comment, removeComment }) => {
+  const navigate = useNavigate();
+
   const dispatch = useAppDispatch();
   const { user: authUser } = useAppSelector((state) => state.auth);
 
-  const { user, createdAt, text, _id } = comment;
+  const { user, createdAt, text, _id, post } = comment;
 
   const handleRemoveComment = () => {
     removeComment(_id);
@@ -23,6 +26,7 @@ const Comment: FC<CommentPropsType> = ({ comment, removeComment }) => {
 
   const handleEditedComment = () => {
     dispatch(setEditComment(comment));
+    navigate(`/full-post/${post}`);
   };
 
   return (

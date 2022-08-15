@@ -1,4 +1,4 @@
-import React, { FC, useState } from "react";
+import React, { FC, useEffect, useState } from "react";
 import classes from "./Profile.module.scss";
 import Header from "../Header/Header";
 import ItemsList from "../ItemsList/ItemsList";
@@ -8,13 +8,13 @@ import {
   useRemoveCommentMutation,
 } from "../../redux/api/commentsApi";
 import {
-  useGetAllUserPostsQuery,
-  useLazyGetOnePostQuery,
+  useLazyGetAllUserPostsQuery,
   useRemovePostMutation,
 } from "../../redux/api/postsApi";
 import Post from "../Post/Post";
 import { useAppSelector } from "../../hooks/appHooks";
 import { getDate } from "../../utils/dateFormater";
+import { Pagination } from "antd";
 
 type PropsType = {
   handlePopup: () => void;
@@ -22,18 +22,27 @@ type PropsType = {
 };
 
 const Profile: FC<PropsType> = ({ handlePopup, openPopup }) => {
+  const [currentPage, setCurrentPage] = useState(1);
   const [active, setActive] = useState("Статьи");
   const {
     user: { fullName, createdAt, _id },
   } = useAppSelector((state) => state.auth);
   const { data: comments, isSuccess: isSuccessComments } =
     useGetAllUserCommentsQuery(_id);
-  const { data: posts, isSuccess: isSuccessPosts } =
-    useGetAllUserPostsQuery(_id);
+  const [getAllUserPost, { data: posts, isSuccess: isSuccessPosts }] =
+    useLazyGetAllUserPostsQuery();
 
   const [removePost] = useRemovePostMutation();
   const [removeComment] = useRemoveCommentMutation();
-  const [getEditedPost] = useLazyGetOnePostQuery();
+
+  const onPagePostChanged = (e: number) => {
+    setCurrentPage(e);
+    getAllUserPost({ userId: _id, currentPage: e });
+  };
+
+  useEffect(() => {
+    getAllUserPost({ userId: _id, currentPage });
+  }, []);
 
   return (
     <div className={classes.profile}>
@@ -62,30 +71,17 @@ const Profile: FC<PropsType> = ({ handlePopup, openPopup }) => {
             <>
               <div>
                 {isSuccessPosts &&
-                  posts.map((post) => (
-                    <Post
-                      key={post._id}
-                      post={post}
-                      removePost={removePost}
-                      getEditedPost={getEditedPost}
-                    />
+                  posts &&
+                  posts.items.map((post) => (
+                    <Post key={post._id} post={post} removePost={removePost} />
                   ))}
               </div>
-              {/*<div className={classes.posts__pagination}>*/}
-              {/*  <Pagination*/}
-              {/*    total={posts.totalUserPosts}*/}
-              {/*    current={posts.currentPage}*/}
-              {/*    showQuickJumper*/}
-              {/*    pageSize={posts.pageSize}*/}
-              {/*    onChange={onPagePostChanged}*/}
-              {/*  />*/}
-              {/*</div>*/}
             </>
           ) : (
             <>
               <div>
                 {isSuccessComments &&
-                  comments.map((comment) => (
+                  comments.items.map((comment) => (
                     <Comment
                       comment={comment}
                       key={comment._id}
@@ -93,18 +89,17 @@ const Profile: FC<PropsType> = ({ handlePopup, openPopup }) => {
                     />
                   ))}
               </div>
-              {/*<div className={classes.posts__pagination}>*/}
-              {/*  <Pagination*/}
-              {/*    total={comments.totalUserComments}*/}
-              {/*    current={comments.currentPage}*/}
-              {/*    showQuickJumper*/}
-              {/*    pageSize={posts.pageSize}*/}
-              {/*    onChange={onPageCommentsChanged}*/}
-              {/*  />*/}
-              {/*</div>*/}
             </>
           )}
         </ItemsList>
+        <Pagination
+          style={{ display: "flex", justifyContent: "center", marginTop: 20 }}
+          total={posts ? posts.total : 0}
+          current={currentPage}
+          showQuickJumper
+          pageSize={5}
+          onChange={onPagePostChanged}
+        />
       </div>
     </div>
   );

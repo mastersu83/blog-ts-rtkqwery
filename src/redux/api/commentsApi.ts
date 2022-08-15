@@ -33,22 +33,22 @@ export const commentsApi = createApi({
       query: (id) => ({
         url: `comments/post/${id}`,
         params: {
-          limit: 5,
+          limit: 20,
         },
       }),
       providesTags: ["Comment"],
     }),
-    getAllUserComments: builder.query<IComments[], string>({
+    getAllUserComments: builder.query<
+      { items: IComments[]; total: number },
+      string
+    >({
       query: (id) => ({
         url: `comments?userId=${id}`,
         params: {
-          limit: 5,
+          limit: 20,
         },
       }),
       providesTags: ["Comment"],
-      transformResponse(res: { items: IComments[]; total: number }) {
-        return res.items;
-      },
     }),
     createComment: builder.mutation<
       IComments[],
@@ -58,6 +58,17 @@ export const commentsApi = createApi({
         url: `comments`,
         method: "POST",
         body: { text, postId },
+      }),
+      invalidatesTags: [{ type: "Comment" }],
+    }),
+    editComment: builder.mutation<
+      IComments,
+      { text: string; commentId: string }
+    >({
+      query: ({ text, commentId }) => ({
+        url: `comments/${commentId}`,
+        method: "PATCH",
+        body: { text },
       }),
       invalidatesTags: [{ type: "Comment" }],
     }),
@@ -72,10 +83,9 @@ export const commentsApi = createApi({
 });
 
 export const {
-  useGetAllCommentsQuery,
   useGetAllCommentsOnePostQuery,
   useCreateCommentMutation,
   useRemoveCommentMutation,
   useGetAllUserCommentsQuery,
-  useLazyGetAllCommentsOnePostQuery,
+  useEditCommentMutation,
 } = commentsApi;

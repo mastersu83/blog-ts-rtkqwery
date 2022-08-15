@@ -1,5 +1,7 @@
 .close {
   &__menu {
+    width: 100px;
+    grid-column: 3 / 4;
     background-color: #13315e;
     display: flex;
     align-items: start;

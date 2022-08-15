@@ -3,15 +3,19 @@ import classes from "./CreatePost.module.scss";
 import Button from "../../common/Button";
 import { useForm } from "react-hook-form";
 import { CreatePostFormValuesType } from "../../types/formValueType";
-import { useCreatePostMutation } from "../../redux/api/postsApi";
+import {
+  useCreatePostMutation,
+  useEditPostMutation,
+} from "../../redux/api/postsApi";
 import { useAppDispatch, useAppSelector } from "../../hooks/appHooks";
 import { removeEditPost } from "../../redux/slices/postsSlice";
 
 const CreatePost = () => {
   const dispatch = useAppDispatch();
-  const { post: editPost, isEdit } = useAppSelector((state) => state.post);
+  const { post: editedPost, isEdit } = useAppSelector((state) => state.post);
 
   const [createPost] = useCreatePostMutation();
+  const [editPost] = useEditPostMutation();
 
   const {
     handleSubmit,
@@ -25,8 +29,13 @@ const CreatePost = () => {
 
   const onSubmit = (data: CreatePostFormValuesType) => {
     const { file, title, text, description } = data;
-    createPost({ title, text, description, file });
+    if (!isEdit) {
+      createPost({ title, text, description, file });
+    } else {
+      editPost({ data, postId: editedPost._id });
+    }
     reset();
+    dispatch(removeEditPost());
   };
 
   const cancel = () => {
@@ -36,11 +45,11 @@ const CreatePost = () => {
 
   useEffect(() => {
     if (isEdit) {
-      setValue("title", editPost.title);
-      setValue("text", editPost.text);
-      setValue("description", editPost.description);
+      setValue("title", editedPost.title);
+      setValue("text", editedPost.text);
+      setValue("description", editedPost.description);
     }
-  }, [isEdit, editPost]);
+  }, [isEdit, editedPost]);
 
   return (
     <>

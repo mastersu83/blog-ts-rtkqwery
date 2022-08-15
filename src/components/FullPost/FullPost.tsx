@@ -9,6 +9,7 @@ import Button from "../../common/Button";
 import ItemsList from "../ItemsList/ItemsList";
 import {
   useCreateCommentMutation,
+  useEditCommentMutation,
   useGetAllCommentsOnePostQuery,
   useRemoveCommentMutation,
 } from "../../redux/api/commentsApi";
@@ -26,11 +27,12 @@ const FullPost = () => {
   const { comment: editedComment, isEdit } = useAppSelector(
     (state) => state.comment
   );
+  const { post: editedPost } = useAppSelector((state) => state.post);
 
   const {
     handleSubmit,
     register,
-    formState: { errors, isValid },
+    formState: { isValid },
     reset,
     setValue,
   } = useForm<{ text: string }>({
@@ -47,18 +49,27 @@ const FullPost = () => {
     data: post,
     isSuccess: isSuccessPost,
     isLoading: isLoadingPost,
-  } = useGetOnePostQuery(String(id));
+    error,
+  } = useGetOnePostQuery(String(editedPost?._id ? editedPost._id : id));
 
   const [createComment] = useCreateCommentMutation();
+  const [editComment] = useEditCommentMutation();
   const [removeComment] = useRemoveCommentMutation();
 
   const onSubmit = (data: { text: string }) => {
     const { text } = data;
     if (id) {
-      createComment({ text, postId: id });
+      if (!isEdit) {
+        createComment({ text, postId: id });
+      } else {
+        editComment({ text, commentId: editedComment._id });
+      }
     }
     reset();
+    dispatch(removeEditComment());
   };
+
+  console.log(error);
 
   const cancel = () => {
     reset();
@@ -70,6 +81,22 @@ const FullPost = () => {
       setValue("text", editedComment.text);
     }
   }, [isEdit, editedComment]);
+
+  if (error) {
+    if ("status" in error) {
+      const errMsg =
+        "error" in error
+          ? error.error
+          : JSON.stringify(error.data).split(":")[1].slice(1, -2);
+      return (
+        <div
+          style={{ display: "flex", justifyContent: "center", marginTop: 20 }}
+        >
+          <h1>{errMsg}</h1>
+        </div>
+      );
+    }
+  }
 
   return (
     <>

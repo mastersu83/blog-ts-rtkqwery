@@ -1,15 +1,16 @@
-import React, { FC, useEffect } from "react";
+import React, { FC, useEffect, useState } from "react";
 import classes from "./Posts.module.scss";
 import Header from "../Header/Header";
 import Post from "../Post/Post";
 import ItemsList from "../ItemsList/ItemsList";
 import {
-  useGetAllPostsQuery,
-  useLazyGetOnePostQuery,
+  useLazyGetAllPostsQuery,
   useRemovePostMutation,
 } from "../../redux/api/postsApi";
-import { useAppDispatch } from "../../hooks/appHooks";
+import { useAppDispatch, useAppSelector } from "../../hooks/appHooks";
 import { setEditPost } from "../../redux/slices/postsSlice";
+import PostSkeleton from "../Preloader/PostSkeleton";
+import { Pagination } from "antd";
 
 type PropsType = {
   handlePopup: () => void;
@@ -18,40 +19,54 @@ type PropsType = {
 
 const Posts: FC<PropsType> = ({ handlePopup, openPopup }) => {
   const dispatch = useAppDispatch();
-  const { data, isSuccess } = useGetAllPostsQuery({});
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const { post, isEdit } = useAppSelector((state) => state.post);
+  const [getAllPost, { data, isSuccess, isFetching }] = useLazyGetAllPostsQuery(
+    {}
+  );
   const [removePost] = useRemovePostMutation();
-  const [getEditedPost, { data: editPost }] = useLazyGetOnePostQuery();
+
+  const onPagePostChanged = (e: number) => {
+    setCurrentPage(e);
+    getAllPost(e);
+  };
 
   useEffect(() => {
-    if (editPost) {
-      dispatch(setEditPost(editPost));
+    if (isEdit) {
+      dispatch(setEditPost(post));
     }
-  }, [editPost]);
+  }, [isEdit]);
+
+  useEffect(() => {
+    getAllPost(currentPage);
+  }, []);
 
   return (
-    <div className={classes.posts}>
-      <Header handlePopup={handlePopup} openPopup={openPopup} />
-      <ItemsList>
-        {isSuccess &&
-          data.map((post) => (
-            <Post
-              key={post._id}
-              post={post}
-              removePost={removePost}
-              getEditedPost={getEditedPost}
-            />
-          ))}
-      </ItemsList>
-      {/*<div className={classes.posts__pagination}>*/}
-      {/*  <Pagination*/}
-      {/*    total={posts.totalPosts}*/}
-      {/*    current={posts.currentPage}*/}
-      {/*    showQuickJumper*/}
-      {/*    pageSize={posts.pageSize}*/}
-      {/*    onChange={onPageChanged}*/}
-      {/*  />*/}
-      {/*</div>*/}
-    </div>
+    <>
+      <div className={classes.posts}>
+        <Header handlePopup={handlePopup} openPopup={openPopup} />
+        {isFetching ? (
+          <PostSkeleton />
+        ) : (
+          <ItemsList>
+            {isSuccess &&
+              data &&
+              data.items.map((post) => (
+                <Post key={post._id} post={post} removePost={removePost} />
+              ))}
+          </ItemsList>
+        )}
+        <Pagination
+          style={{ display: "flex", justifyContent: "center", marginTop: 20 }}
+          total={data ? data.total : 0}
+          current={currentPage}
+          showQuickJumper
+          pageSize={5}
+          onChange={onPagePostChanged}
+        />
+      </div>
+    </>
   );
 };
 

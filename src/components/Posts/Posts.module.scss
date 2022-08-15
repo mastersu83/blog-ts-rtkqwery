@@ -1,5 +1,7 @@
 .posts {
   padding: 0 20px 34px 20px;
+  grid-column: 2 / 3;
+
   &__list {
     max-height: 830px;
     overflow-y: auto;

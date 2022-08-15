@@ -5,15 +5,16 @@ import { Link } from "react-router-dom";
 import EditBlock from "../../common/EditBlock";
 import { IPost } from "../../types/postType";
 import { getDate } from "../../utils/dateFormater";
-import { useAppSelector } from "../../hooks/appHooks";
+import { useAppDispatch, useAppSelector } from "../../hooks/appHooks";
+import { setEditPost } from "../../redux/slices/postsSlice";
 
 type PostPropsType = {
   post: IPost;
   removePost: (id: string) => void;
-  getEditedPost: (id: string) => void;
 };
 
-const Post: FC<PostPropsType> = ({ post, removePost, getEditedPost }) => {
+const Post: FC<PostPropsType> = ({ post, removePost }) => {
+  const dispatch = useAppDispatch();
   const { _id, title, description, views, photoUrl, createdAt, user } = post;
   const { user: authUser } = useAppSelector((state) => state.auth);
 
@@ -22,7 +23,7 @@ const Post: FC<PostPropsType> = ({ post, removePost, getEditedPost }) => {
   };
 
   const handleEditedPost = () => {
-    getEditedPost(_id);
+    dispatch(setEditPost(post));
   };
 
   return (
@@ -34,7 +35,7 @@ const Post: FC<PostPropsType> = ({ post, removePost, getEditedPost }) => {
           handleEdited={handleEditedPost}
           editPost={true}
         />
-        <Link to={`/full-post/${_id}`}>
+        <Link onClick={handleEditedPost} to={`/full-post/${_id}`}>
           <div className={classes.posts__itemTitle}>{title}</div>
         </Link>
 
