@@ -14,7 +14,10 @@ import { useAppDispatch, useAppSelector } from "./hooks/appHooks";
 import { setUser } from "./redux/slices/authSlice";
 
 const App = () => {
-  const { isAuth } = useAppSelector((state) => state.auth);
+  const {
+    isAuth,
+    user: { fullName },
+  } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
   const { pathname } = useLocation();
   const [openPopup, setOpenPopup] = useState<boolean>(false);
@@ -44,7 +47,7 @@ const App = () => {
       <div className={`main ${openMenu ? "main__move" : ""}`}>
         <Routes>
           <Route path="/full-post/:id" element={<FullPost />} />
-          <Route path="/" element={<About />} />
+          <Route path="/" element={<About fullName={fullName} />} />
           <Route path={"/create-post"} element={<CreatePost />} />
           <Route path="*" element={<div>notfound</div>} />
 

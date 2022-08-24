@@ -13,7 +13,7 @@ interface CreatePostFormInputPropsTypes {
   label?: string;
   placeholder?: string;
   className: any;
-  name: "title" | "text" | "description" | "file";
+  name: "title" | "text" | "description" | "photoUrl";
 }
 
 const CreatePostFormInput: FC<CreatePostFormInputPropsTypes> = ({

@@ -25,9 +25,11 @@ const Post: FC<PostPropsType> = ({ post, removePost }) => {
     removePost(_id);
   };
 
-  const handleEditedPost = () => {
+  const handleEditedPost = (flag?: boolean) => {
     if (editedPost._id !== _id) {
-      getOnePost(_id);
+      if (flag) {
+        getOnePost(_id);
+      }
       dispatch(setEditPost(post));
     }
   };
@@ -41,7 +43,7 @@ const Post: FC<PostPropsType> = ({ post, removePost }) => {
           handleEdited={handleEditedPost}
           editPost={true}
         />
-        <Link onClick={handleEditedPost} to={`/full-post/${_id}`}>
+        <Link onClick={() => handleEditedPost(true)} to={`/full-post/${_id}`}>
           <div className={classes.posts__itemTitle}>{title}</div>
         </Link>
 

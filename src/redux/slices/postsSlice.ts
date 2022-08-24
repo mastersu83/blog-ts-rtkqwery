@@ -3,10 +3,14 @@ import { IPost } from "../../types/postType";
 
 type InitialStateType = {
   post: IPost;
+  searchPost: IPost[];
+  total: number;
 };
 
 const initialState: InitialStateType = {
   post: {} as IPost,
+  searchPost: [],
+  total: 0,
 };
 
 export const postsSlice = createSlice({
@@ -19,7 +23,14 @@ export const postsSlice = createSlice({
     removeEditPost: (state: InitialStateType) => {
       state.post = {} as IPost;
     },
+    setSearchPost: (
+      state: InitialStateType,
+      action: PayloadAction<{ items: IPost[]; total: number }>
+    ) => {
+      state.searchPost = action.payload.items;
+    },
   },
 });
 
-export const { setEditPost, removeEditPost } = postsSlice.actions;
+export const { setEditPost, removeEditPost, setSearchPost } =
+  postsSlice.actions;

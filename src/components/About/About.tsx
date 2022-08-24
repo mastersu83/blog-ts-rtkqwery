@@ -2,10 +2,10 @@ import React from "react";
 import classes from "./About.module.scss";
 import miPhoto from "../../assets/img/mi-foto.jpg";
 
-const About = () => {
+const About = ({ fullName }: { fullName: string }) => {
   return (
     <div className={classes.about}>
-      <div className={classes.about__name}>Vasya Pupkin</div>
+      <div className={classes.about__name}>{fullName}</div>
       <div className={classes.about__title}>Блог фронтенд-разработчика</div>
       <img src={miPhoto} alt="miPhoto" className={classes.about__photo} />
       <div className={classes.about__me}>Обо мне</div>

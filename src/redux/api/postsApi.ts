@@ -18,10 +18,14 @@ export const postsApi = createApi({
     },
   }),
   endpoints: (builder) => ({
-    getAllPosts: builder.query<{ total: number; items: IPost[] }, number>({
-      query: (currentPage) => ({
+    getAllPosts: builder.query<
+      { total: number; items: IPost[] },
+      { currentPage: number; search: string }
+    >({
+      query: ({ currentPage, search }) => ({
         url: `posts`,
         params: {
+          query: search ? search : "",
           limit: 5,
           page: currentPage,
         },
@@ -47,12 +51,27 @@ export const postsApi = createApi({
       }),
     }),
     createPost: builder.mutation<IPost, CreatePostFormValuesType>({
-      query: ({ title, description, text, file }) => ({
+      query: ({ title, description, text, photoUrl }) => ({
         url: `posts`,
         method: "POST",
-        body: { title, description, text, file },
+        body: { title, description, text, photoUrl },
       }),
       invalidatesTags: [{ type: "Post" }],
+    }),
+    uploadFile: builder.mutation({
+      async queryFn(file, _queryApi, _extraOptions, fetchWithBQ) {
+        const formData = new FormData();
+        formData.append("file", file[0]);
+        const response = await fetchWithBQ({
+          url: "posts/upload",
+          method: "POST",
+          body: formData,
+        });
+        if (response.error) throw response.error;
+        return response.data
+          ? { data: response.data }
+          : { error: response.error };
+      },
     }),
     editPost: builder.mutation<
       IPost,
@@ -72,6 +91,17 @@ export const postsApi = createApi({
       }),
       invalidatesTags: [{ type: "Post" }],
     }),
+    searchPost: builder.query<
+      { total: number; items: IPost[] },
+      { search: string; currentPage: number }
+    >({
+      query: ({ search, currentPage }) => ({
+        url: `posts?query=${search}&limit=5`,
+        page: currentPage,
+        limit: 5,
+      }),
+      providesTags: ["Post"],
+    }),
   }),
 });
 
@@ -83,4 +113,6 @@ export const {
   useLazyGetAllUserPostsQuery,
   useLazyGetAllPostsQuery,
   useEditPostMutation,
+  useUploadFileMutation,
+  useLazySearchPostQuery,
 } = postsApi;

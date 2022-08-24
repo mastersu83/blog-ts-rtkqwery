@@ -29,7 +29,7 @@ const PopupFormInput: FC<FormInputPropsTypes> = ({
       <label>{label}</label>
       <input
         {...register(name, {
-          required: `Поле ${name} обязательноxc  к заполнению`,
+          required: `Поле ${name} обязательно к заполнению`,
           minLength: {
             value: 5,
             message: "Минимум 5 символов",

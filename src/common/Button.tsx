@@ -21,12 +21,7 @@ const Button: FC<ButtonPropsTypes> = ({ text, disabled, name, cancel }) => {
           {text}
         </button>
       ) : (
-        <div
-          onClick={cancel}
-          className={`${classes.yellow__button} ${
-            !disabled ? classes.disabled : ""
-          }`}
-        >
+        <div onClick={cancel} className={`${classes.yellow__button} `}>
           {text}
         </div>
       )}

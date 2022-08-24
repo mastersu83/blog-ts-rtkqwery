@@ -82,8 +82,8 @@ const Profile: FC<PropsType> = ({ handlePopup }) => {
                 {isSuccessComments &&
                   comments.items.map((comment) => (
                     <Comment
-                      comment={comment}
                       key={comment._id}
+                      comment={comment}
                       removeComment={removeComment}
                     />
                   ))}
@@ -92,8 +92,13 @@ const Profile: FC<PropsType> = ({ handlePopup }) => {
           )}
         </ItemsList>
         <Pagination
-          style={{ display: "flex", justifyContent: "center", marginTop: 20 }}
-          total={posts ? posts.total : 0}
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginTop: 20,
+            marginBottom: 40,
+          }}
+          total={active === "Статьи" ? posts?.total : comments?.total}
           current={currentPage}
           showQuickJumper
           pageSize={5}

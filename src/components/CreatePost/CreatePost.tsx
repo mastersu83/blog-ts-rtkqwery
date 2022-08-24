@@ -6,12 +6,14 @@ import { CreatePostFormValuesType } from "../../types/formValueType";
 import {
   useCreatePostMutation,
   useEditPostMutation,
+  useUploadFileMutation,
 } from "../../redux/api/postsApi";
 import { useAppDispatch, useAppSelector } from "../../hooks/appHooks";
 import { removeEditPost } from "../../redux/slices/postsSlice";
 
 const CreatePost = () => {
   const dispatch = useAppDispatch();
+
   const { post: editedPost } = useAppSelector((state) => state.post);
 
   const [createPost] = useCreatePostMutation();
@@ -27,11 +29,16 @@ const CreatePost = () => {
     mode: "all",
   });
 
-  const onSubmit = (data: CreatePostFormValuesType) => {
-    const { file, title, text, description } = data;
+  const [uploadFile] = useUploadFileMutation();
+
+  const onSubmit = async (data: CreatePostFormValuesType) => {
+    const { photoUrl, title, text, description } = data;
     if (!editedPost?._id) {
-      createPost({ title, text, description, file });
+      let testUrl: any = await uploadFile(photoUrl);
+      createPost({ title, text, description, photoUrl: testUrl.data.url });
     } else {
+      let testUrl: any = await uploadFile(photoUrl);
+      const data = { title, text, description, photoUrl: testUrl.data.url };
       editPost({ data, postId: editedPost._id });
     }
     reset();
@@ -42,8 +49,6 @@ const CreatePost = () => {
     reset();
     dispatch(removeEditPost());
   };
-
-  console.log(editedPost?._id ? "yes" : "no");
 
   useEffect(() => {
     if (editedPost) {
@@ -67,7 +72,7 @@ const CreatePost = () => {
           className={classes.create__titleInput}
           placeholder="Введите заголовок..."
         />
-        <div style={{ height: 40 }}>
+        <div style={{ height: 40, color: "red" }}>
           {errors?.title && <p>{errors?.title?.message || "Error"}</p>}
         </div>
         <div className={classes.create__shortDesc}>Короткое описание:</div>
@@ -81,17 +86,22 @@ const CreatePost = () => {
           })}
           className={classes.create__shortInput}
         />
-        <div style={{ height: 40 }}>
+        <div style={{ height: 40, color: "red" }}>
           {errors?.description && (
             <p>{errors?.description?.message || "Error"}</p>
           )}
         </div>
         <div className={classes.create__linkTitle}>Ссылка на изображение:</div>
         <input
-          {...register("file")}
+          {...register("photoUrl", {
+            required: `Поле  обязательно к заполнению`,
+          })}
           className={classes.create__linkInput}
           type="file"
         />
+        <div style={{ height: 40, color: "red" }}>
+          {errors?.photoUrl && <p>{errors?.photoUrl?.message || "Error"}</p>}
+        </div>
         <div className={classes.create__longDesc}>Полное описание:</div>
         <textarea
           {...register("text", {
@@ -103,7 +113,7 @@ const CreatePost = () => {
           })}
           className={classes.create__longInput}
         />
-        <div style={{ height: 40 }}>
+        <div style={{ height: 40, color: "red" }}>
           {errors?.text && <p>{errors?.text?.message || "Error"}</p>}
         </div>
         <div className={classes.create__btn}>

@@ -7,5 +7,5 @@ export type CreatePostFormValuesType = {
   title: string;
   text: string;
   description: string;
-  file: string;
+  photoUrl?: string;
 };

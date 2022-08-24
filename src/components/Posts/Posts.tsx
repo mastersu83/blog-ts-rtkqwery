@@ -20,15 +20,15 @@ const Posts: FC<PropsType> = ({ handlePopup }) => {
   const dispatch = useAppDispatch();
   const [currentPage, setCurrentPage] = useState(1);
 
-  const { post } = useAppSelector((state) => state.post);
-  const [getAllPost, { data, isSuccess, isFetching }] = useLazyGetAllPostsQuery(
-    {}
-  );
+  const { post, searchPost } = useAppSelector((state) => state.post);
+
+  const [getAllPost, { data, isSuccess, isFetching }] =
+    useLazyGetAllPostsQuery();
+
   const [removePost] = useRemovePostMutation();
 
   const onPagePostChanged = (e: number) => {
     setCurrentPage(e);
-    getAllPost(e);
   };
 
   useEffect(() => {
@@ -38,15 +38,21 @@ const Posts: FC<PropsType> = ({ handlePopup }) => {
   }, [post._id]);
 
   useEffect(() => {
-    getAllPost(currentPage);
-  }, []);
+    getAllPost({ currentPage, search: "" });
+  }, [currentPage]);
 
   return (
     <>
       <div className={classes.posts}>
-        <Header handlePopup={handlePopup} />
+        <Header handlePopup={handlePopup} currentPage={currentPage} />
         {isFetching ? (
           <PostSkeleton />
+        ) : searchPost.length ? (
+          <ItemsList>
+            {searchPost.map((post) => (
+              <Post key={post._id} post={post} removePost={removePost} />
+            ))}
+          </ItemsList>
         ) : (
           <ItemsList>
             {isSuccess &&
