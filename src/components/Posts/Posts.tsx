@@ -9,7 +9,7 @@ import {
   useRemovePostMutation,
 } from "../../redux/api/postsApi";
 import { useAppDispatch, useAppSelector } from "../../hooks/appHooks";
-import { setAllPost, setEditPost } from "../../redux/slices/postsSlice";
+import { setEditPost } from "../../redux/slices/postsSlice";
 import PostSkeleton from "../Preloader/PostSkeleton";
 import { Pagination } from "antd";
 
@@ -26,10 +26,7 @@ const Posts: FC<PropsType> = ({ handlePopup }) => {
   const [getAllPost, { data, isSuccess, isFetching }] =
     useLazyGetAllPostsQuery();
 
-  const { data: test, isSuccess: isSuccessTest } = useGetAllPostsQuery({
-    currentPage,
-    search: "",
-  });
+  const { data: test } = useGetAllPostsQuery({ currentPage, search: "" });
 
   console.log(test);
 
@@ -47,8 +44,7 @@ const Posts: FC<PropsType> = ({ handlePopup }) => {
 
   useEffect(() => {
     getAllPost({ currentPage, search: "" });
-    dispatch(setAllPost(test ? test.items : []));
-  }, [currentPage, isSuccessTest]);
+  }, [currentPage]);
 
   return (
     <>

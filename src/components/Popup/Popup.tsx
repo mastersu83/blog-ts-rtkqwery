@@ -44,12 +44,7 @@ const Popup: FC<PropsType> = ({ openPopup, handlePopup }) => {
   ] = useLoginMutation();
   const [
     registration,
-    {
-      data: registerData,
-      isSuccess: registerIsSuccess,
-      error: registerError,
-      reset: registerReset,
-    },
+    { data: registerData, error: registerError, reset: registerReset },
   ] = useRegisterMutation();
 
   const onSubmit = (data: PopupFormValuesType) => {
