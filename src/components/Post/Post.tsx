@@ -18,7 +18,7 @@ const Post: FC<PostPropsType> = ({ post, removePost }) => {
   const dispatch = useAppDispatch();
   const { _id, title, description, views, photoUrl, createdAt, user } = post;
   const { user: authUser } = useAppSelector((state) => state.auth);
-  const { post: editedPost } = useAppSelector((state) => state.post);
+  const { editPost: editedPost } = useAppSelector((state) => state.post);
   const [getOnePost, { data }] = useLazyGetOnePostQuery();
 
   const handleRemovePost = () => {

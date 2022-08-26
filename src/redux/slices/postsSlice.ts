@@ -2,14 +2,16 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { IPost } from "../../types/postType";
 
 type InitialStateType = {
-  post: IPost;
+  editPost: IPost;
   searchPost: IPost[];
+  allPosts: IPost[];
   total: number;
 };
 
 const initialState: InitialStateType = {
-  post: {} as IPost,
+  editPost: {} as IPost,
   searchPost: [],
+  allPosts: [],
   total: 0,
 };
 
@@ -17,11 +19,14 @@ export const postsSlice = createSlice({
   name: "posts",
   initialState,
   reducers: {
+    setAllPost: (state: InitialStateType, action: PayloadAction<IPost[]>) => {
+      state.allPosts = action.payload;
+    },
     setEditPost: (state: InitialStateType, action: PayloadAction<IPost>) => {
-      state.post = action.payload;
+      state.editPost = action.payload;
     },
     removeEditPost: (state: InitialStateType) => {
-      state.post = {} as IPost;
+      state.editPost = {} as IPost;
     },
     setSearchPost: (
       state: InitialStateType,
@@ -32,5 +37,5 @@ export const postsSlice = createSlice({
   },
 });
 
-export const { setEditPost, removeEditPost, setSearchPost } =
+export const { setEditPost, removeEditPost, setSearchPost, setAllPost } =
   postsSlice.actions;

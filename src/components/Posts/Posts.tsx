@@ -4,11 +4,12 @@ import Header from "../Header/Header";
 import Post from "../Post/Post";
 import ItemsList from "../ItemsList/ItemsList";
 import {
+  useGetAllPostsQuery,
   useLazyGetAllPostsQuery,
   useRemovePostMutation,
 } from "../../redux/api/postsApi";
 import { useAppDispatch, useAppSelector } from "../../hooks/appHooks";
-import { setEditPost } from "../../redux/slices/postsSlice";
+import { setAllPost, setEditPost } from "../../redux/slices/postsSlice";
 import PostSkeleton from "../Preloader/PostSkeleton";
 import { Pagination } from "antd";
 
@@ -20,10 +21,17 @@ const Posts: FC<PropsType> = ({ handlePopup }) => {
   const dispatch = useAppDispatch();
   const [currentPage, setCurrentPage] = useState(1);
 
-  const { post, searchPost } = useAppSelector((state) => state.post);
+  const { editPost, searchPost } = useAppSelector((state) => state.post);
 
   const [getAllPost, { data, isSuccess, isFetching }] =
     useLazyGetAllPostsQuery();
+
+  const { data: test, isSuccess: isSuccessTest } = useGetAllPostsQuery({
+    currentPage,
+    search: "",
+  });
+
+  console.log(test);
 
   const [removePost] = useRemovePostMutation();
 
@@ -32,14 +40,15 @@ const Posts: FC<PropsType> = ({ handlePopup }) => {
   };
 
   useEffect(() => {
-    if (post._id) {
-      dispatch(setEditPost(post));
+    if (editPost._id) {
+      dispatch(setEditPost(editPost));
     }
-  }, [post._id]);
+  }, [editPost._id]);
 
   useEffect(() => {
     getAllPost({ currentPage, search: "" });
-  }, [currentPage]);
+    dispatch(setAllPost(test ? test.items : []));
+  }, [currentPage, isSuccessTest]);
 
   return (
     <>

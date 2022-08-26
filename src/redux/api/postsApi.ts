@@ -54,7 +54,12 @@ export const postsApi = createApi({
       query: ({ title, description, text, photoUrl }) => ({
         url: `posts`,
         method: "POST",
-        body: { title, description, text, photoUrl },
+        body: {
+          title,
+          description,
+          text,
+          photoUrl: photoUrl ? photoUrl : "null",
+        },
       }),
       invalidatesTags: [{ type: "Post" }],
     }),
@@ -77,10 +82,15 @@ export const postsApi = createApi({
       IPost,
       { data: CreatePostFormValuesType; postId: string }
     >({
-      query: ({ data, postId }) => ({
+      query: ({ data: { title, description, text, photoUrl }, postId }) => ({
         url: `posts/${postId}`,
         method: "PATCH",
-        body: data,
+        body: {
+          title,
+          description,
+          text,
+          photoUrl,
+        },
       }),
       invalidatesTags: [{ type: "Post" }],
     }),
@@ -114,5 +124,5 @@ export const {
   useLazyGetAllPostsQuery,
   useEditPostMutation,
   useUploadFileMutation,
-  useLazySearchPostQuery,
+  useGetAllPostsQuery,
 } = postsApi;

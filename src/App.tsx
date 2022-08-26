@@ -49,7 +49,7 @@ const App = () => {
           <Route path="/full-post/:id" element={<FullPost />} />
           <Route path="/" element={<About fullName={fullName} />} />
           <Route path={"/create-post"} element={<CreatePost />} />
-          <Route path="*" element={<div>notfound</div>} />
+          <Route path="*" element={<Navigate to="/" />} />
 
           <Route
             path="/profile"

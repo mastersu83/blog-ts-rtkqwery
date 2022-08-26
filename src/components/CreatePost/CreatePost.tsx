@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import classes from "./CreatePost.module.scss";
 import Button from "../../common/Button";
 import { useForm } from "react-hook-form";
@@ -13,8 +13,9 @@ import { removeEditPost } from "../../redux/slices/postsSlice";
 
 const CreatePost = () => {
   const dispatch = useAppDispatch();
+  const [checkEditPhoto, setCheckEditPhoto] = useState("null");
 
-  const { post: editedPost } = useAppSelector((state) => state.post);
+  const { editPost: editedPost } = useAppSelector((state) => state.post);
 
   const [createPost] = useCreatePostMutation();
   const [editPost] = useEditPostMutation();
@@ -33,12 +34,24 @@ const CreatePost = () => {
 
   const onSubmit = async (data: CreatePostFormValuesType) => {
     const { photoUrl, title, text, description } = data;
+    let testUrl: any = null;
+    if (photoUrl?.length) {
+      testUrl = await uploadFile(photoUrl);
+    }
     if (!editedPost?._id) {
-      let testUrl: any = await uploadFile(photoUrl);
-      createPost({ title, text, description, photoUrl: testUrl.data.url });
+      createPost({
+        title,
+        text,
+        description,
+        photoUrl: testUrl && testUrl.data.url,
+      });
     } else {
-      let testUrl: any = await uploadFile(photoUrl);
-      const data = { title, text, description, photoUrl: testUrl.data.url };
+      const data = {
+        title,
+        text,
+        description,
+        photoUrl: testUrl ? testUrl.data.url : checkEditPhoto,
+      };
       editPost({ data, postId: editedPost._id });
     }
     reset();
@@ -55,6 +68,9 @@ const CreatePost = () => {
       setValue("title", editedPost.title);
       setValue("text", editedPost.text);
       setValue("description", editedPost.description);
+      if (editedPost.photoUrl !== "null") {
+        setCheckEditPhoto(editedPost.photoUrl);
+      }
     }
   }, [editedPost]);
 
@@ -93,9 +109,7 @@ const CreatePost = () => {
         </div>
         <div className={classes.create__linkTitle}>Ссылка на изображение:</div>
         <input
-          {...register("photoUrl", {
-            required: `Поле  обязательно к заполнению`,
-          })}
+          {...register("photoUrl")}
           className={classes.create__linkInput}
           type="file"
         />

@@ -27,7 +27,7 @@ const FullPost = () => {
   const { comment: editedComment, isEdit } = useAppSelector(
     (state) => state.comment
   );
-  const { post: editedPost } = useAppSelector((state) => state.post);
+  const { editPost: editedPost } = useAppSelector((state) => state.post);
 
   const {
     handleSubmit,
